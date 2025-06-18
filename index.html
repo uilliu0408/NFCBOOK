@@ -156,15 +156,18 @@
       });
     };
 
-    const confirmDelete = (index) => {
-      if (confirm("휴지통으로 보내시겠습니까?")) {
-        let entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
-        let trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
-        trash.push(entries[index]);
-        entries.splice(index, 1);
-        localStorage.setItem(dataKey, JSON.stringify(entries));
-        localStorage.setItem(trashKey, JSON.stringify(trash));
-        displayEntries(); saveRoomData();
+   const confirmDelete = (actualIndex) => {
+  if (confirm("휴지통으로 보내시겠습니까?")) {
+    let entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
+    let trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
+
+    trash.push(entries[actualIndex]);
+    entries.splice(actualIndex, 1);
+
+    localStorage.setItem(dataKey, JSON.stringify(entries));
+    localStorage.setItem(trashKey, JSON.stringify(trash));
+    displayEntries();
+    saveRoomData();
       }
     };
 
