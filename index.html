@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>독서기록장 + 휴지통</title>
+  <title>  <title>\u독서기록장 + 휴지통</title>
   <style>
     body { font-family: sans-serif; background: #f9f6f1; margin: 0; padding: 0; }
     header { background: #4a4e69; color: white; padding: 1rem; text-align: center; }
@@ -27,13 +27,13 @@
 </head>
 <body>
   <header>
-    <h1>🗂️ NFC 독서기록장 </h1>
+    <h1>📂️ NFC 독서기록장 </h1>
   </header>
   <main>
     <div class="box" id="passwordSection">
       <label>비밀번호를 입력하거나 새로 만들어주세요.</label>
       <input type="password" id="password" maxlength="4" />
-      <button onclick="checkPassword()">접속</button>
+      <button onclick="checkPassword()">접소</button>
       <p id="passMsg" style="color:red;"></p>
     </div>
 
@@ -43,7 +43,7 @@
       <label>읽은 날짜</label><input id="date" type="date" />
       <label>읽은 페이지</label><input id="pages" type="text" />
       <label>책 내용 요약</label><textarea id="summary"></textarea>
-      <label>인상 깊은 문장</label><textarea id="quote"></textarea>
+      <label>인상 깍은 문장</label><textarea id="quote"></textarea>
 
       <label>책 관련 사진</label>
       <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" />
@@ -70,18 +70,61 @@
     <div id="trashBin" class="box">
       <h3>🗑️ 휴지통</h3>
       <div id="trashEntries"></div>
-      <button onclick="clearTrash()">휴지통 비우기</button>
+      <button onclick="clearTrash()">휴지통 비웁기</button>
     </div>
     <div id="entries"></div>
   </main>
 
-  <script>
+  <div id="imageModal" onclick="closeModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+       background-color:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center;">
+    <img id="modalImage" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);
+         max-width:95%; max-height:95%; box-shadow:0 0 30px rgba(255,255,255,0.5); border-radius:10px;" />
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwf8YefXWjheKg5SYjWUqA0khJu37pMGk",
+      authDomain: "chat-38c87.firebaseapp.com",
+      projectId: "chat-38c87",
+      storageBucket: "chat-38c87.appspot.com",
+      messagingSenderId: "173428820608",
+      appId: "1:173428820608:web:e160cacff277f35a253465",
+      measurementId: "G-KRX6BP913S"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get("id") || "default";
     const passKey = `password_${roomId}`;
     const dataKey = `readingEntriesNFC_${roomId}`;
     const trashKey = `trashEntries_${roomId}`;
 
+    async function loadRoomData() {
+      const docSnap = await getDoc(doc(db, "rooms", roomId));
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.entries) localStorage.setItem(dataKey, JSON.stringify(data.entries));
+        if (data.trash) localStorage.setItem(trashKey, JSON.stringify(data.trash));
+        if (data.password) localStorage.setItem(passKey, data.password);
+      }
+    }
+
+    async function saveRoomData() {
+      const entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
+      const trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
+      const password = localStorage.getItem(passKey) || "";
+      await setDoc(doc(db, "rooms", roomId), { entries, trash, password });
+    }
+
+    window.saveRoomData = saveRoomData;
+    loadRoomData();
+  </script>
+
+  <script>
     const checkPassword = () => {
       const input = document.getElementById("password").value;
       const stored = localStorage.getItem(passKey);
@@ -125,6 +168,7 @@
       const entriesDiv = document.getElementById("entries");
       entriesDiv.innerHTML = "";
       entries.slice().reverse().forEach((entry, i) => {
+        const actualIndex = entries.length - 1 - i;
         entriesDiv.innerHTML += `
           <div class="entry box">
             <h3>${entry.title} - ${entry.author}</h3>
@@ -134,7 +178,7 @@
             <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
             <p><strong>별점:</strong> ${entry.rating}</p>
             ${entry.image ? `<img src="${entry.image}" style='max-width:100%; margin-top:0.5rem; cursor:pointer;' onclick='openModal("${entry.image}")'/>` : ""}
-            <button onclick="confirmDelete(${i})">삭제</button>
+            <button onclick="confirmDelete(${actualIndex})">삭제</button>
           </div>`;
       });
     };
@@ -144,10 +188,11 @@
       const trashDiv = document.getElementById("trashEntries");
       trashDiv.innerHTML = "";
       trash.slice().reverse().forEach((entry, i) => {
+        const realIndex = trash.length - 1 - i;
         trashDiv.innerHTML += `
           <div class="trash-entry box">
             <h4>${entry.title} - ${entry.author}</h4>
-            <button onclick="restoreEntry(${i})">복구</button>
+            <button onclick="restoreEntry(${realIndex})">복구</button>
           </div>`;
       });
     };
