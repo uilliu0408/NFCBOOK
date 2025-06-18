@@ -139,16 +139,15 @@
       });
     };
 
-   const displayTrash = () => {
-  const trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
-  const trashDiv = document.getElementById("trashEntries");
-  trashDiv.innerHTML = "";
-  trash.slice().reverse().forEach((entry, i) => {
-    const actualIndex = trash.length - 1 - i;
-    trashDiv.innerHTML += `
-      <div class="trash-entry box">
-        <h4>${entry.title} - ${entry.author}</h4>
-        <button onclick="restoreEntry(${actualIndex})">복구</button>
+    const displayTrash = () => {
+      const trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
+      const trashDiv = document.getElementById("trashEntries");
+      trashDiv.innerHTML = "";
+      trash.slice().reverse().forEach((entry, i) => {
+        trashDiv.innerHTML += 
+          <div class="trash-entry box">
+            <h4>${entry.title} - ${entry.author}</h4>
+            <button onclick="restoreEntry(${i})">복구</button>
           </div>;
       });
     };
