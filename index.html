@@ -44,10 +44,8 @@
       <label>읽은 페이지</label><input id="pages" type="text" />
       <label>책 내용 요약</label><textarea id="summary"></textarea>
       <label>인상 깊은 문장</label><textarea id="quote"></textarea>
-      
       <label>책 관련 사진</label>
       <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" />
-
       <label>별점</label>
       <select id="rating">
         <option value="⭐️">⭐️</option><option value="⭐️⭐️">⭐️⭐️</option>
@@ -131,10 +129,8 @@
       const entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
       const entriesDiv = document.getElementById("entries");
       entriesDiv.innerHTML = "";
-
-      entries.forEach((_, i) => {
-        const actualIndex = entries.length - 1 - i;
-        const entry = entries[actualIndex];
+      entries.slice().reverse().forEach((entry, i, arr) => {
+        const realIndex = arr.length - 1 - i;
         entriesDiv.innerHTML += `
           <div class="entry box">
             <h3>${entry.title} - ${entry.author}</h3>
@@ -144,7 +140,7 @@
             <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
             <p><strong>별점:</strong> ${entry.rating}</p>
             ${entry.image ? `<img src="${entry.image}" style='max-width:100%; margin-top:0.5rem; cursor:pointer;' onclick='openModal("${entry.image}")'/>` : ""}
-            <button onclick="confirmDelete(${actualIndex})">삭제</button>
+            <button onclick="confirmDelete(${realIndex})">삭제</button>
           </div>
         `;
       });
@@ -172,11 +168,12 @@
       const trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
       const trashDiv = document.getElementById("trashEntries");
       trashDiv.innerHTML = "";
-      trash.forEach((entry, i) => {
+      trash.slice().reverse().forEach((entry, i, arr) => {
+        const realIndex = arr.length - 1 - i;
         trashDiv.innerHTML += `
           <div class="trash-entry box">
             <h4>${entry.title} - ${entry.author}</h4>
-            <button onclick="restoreEntry(${i})">복구</button>
+            <button onclick="restoreEntry(${realIndex})">복구</button>
           </div>
         `;
       });
@@ -215,7 +212,6 @@
     const handleImageUpload = (event) => {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
@@ -225,10 +221,8 @@
           const canvas = document.createElement("canvas");
           canvas.width = Math.min(img.width, MAX_WIDTH);
           canvas.height = img.height * scaleFactor;
-
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
           uploadedImageBase64 = canvas.toDataURL("image/jpeg", 0.7);
         };
         img.src = e.target.result;
@@ -294,7 +288,6 @@
     }
 
     window.saveRoomData = saveRoomData;
-
     loadRoomData();
   </script>
 </body>
