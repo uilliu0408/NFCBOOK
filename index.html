@@ -3,27 +3,89 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>독서기록장 + 휴지통</title>
+  <title>NFC 독서기록장</title>
   <style>
-    body { font-family: sans-serif; background: #f9f6f1; margin: 0; padding: 0; }
-    header { background: #4a4e69; color: white; padding: 1rem; text-align: center; }
-    main { padding: 1rem; max-width: 800px; margin: auto; }
-    .box {
-      background: white; border-radius: 10px; padding: 1rem; margin-bottom: 1rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    input, textarea, button, select {
-      display: block; width: 100%; margin-top: 0.5rem;
-      padding: 0.5rem; font-size: 1rem; border-radius: 5px; border: 1px solid #ccc;
-    }
-    button {
-      background-color: #4a4e69; color: white; border: none; cursor: pointer;
-      margin-top: 1rem;
-    }
-    button:hover { background-color: #22223b; }
-    #entries, #trashBin, #bookForm { display: none; }
-    .entry, .trash-entry { margin-bottom: 1rem; }
-  </style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+KR:wght@300;500&display=swap');
+
+  body {
+    font-family: 'Noto Sans KR', 'Orbitron', sans-serif;
+    background: url('https://images.unsplash.com/photo-1477201389074-1863f668fac4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+  }
+
+  header {
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 2px;
+  }
+
+  main {
+    padding: 1rem;
+    max-width: 800px;
+    margin: auto;
+  }
+
+  .box {
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 10px rgba(255,255,255,0.1);
+  }
+
+  input, textarea, button, select {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    background-color: rgba(255,255,255,0.1);
+    color: #fff;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: #ccc;
+  }
+
+  button {
+    background-color: #5c5be5;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #8d86f3;
+  }
+
+  #entries, #trashBin, #bookForm {
+    display: none;
+  }
+
+  .entry, .trash-entry {
+    margin-bottom: 1rem;
+  }
+
+  img {
+    border-radius: 8px;
+  }
+
+  select {
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+  }
+</style>
+
 </head>
 <body>
   <header>
