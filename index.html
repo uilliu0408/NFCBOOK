@@ -44,7 +44,7 @@
       <label>읽은 페이지</label><input id="pages" type="text" />
       <label>책 내용 요약</label><textarea id="summary"></textarea>
       <label>인상 깊은 문장</label><textarea id="quote"></textarea>
-
+      
       <label>책 관련 사진</label>
       <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" />
 
@@ -67,20 +67,27 @@
     </div>
 
     <hr />
+    <div id="entries"></div>
     <div id="trashBin" class="box">
       <h3>🗑️ 휴지통</h3>
       <div id="trashEntries"></div>
       <button onclick="clearTrash()">휴지통 비우기</button>
     </div>
-    <div id="entries"></div>
   </main>
+
+  <div id="imageModal" onclick="closeModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+       background-color:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center;">
+    <img id="modalImage" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);
+         max-width:95%; max-height:95%; box-shadow:0 0 30px rgba(255,255,255,0.5); border-radius:10px;" />
+  </div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get("id") || "default";
-    const passKey = password_${roomId};
-    const dataKey = readingEntriesNFC_${roomId};
-    const trashKey = trashEntries_${roomId};
+
+    const passKey = `password_${roomId}`;
+    const dataKey = `readingEntriesNFC_${roomId}`;
+    const trashKey = `trashEntries_${roomId}`;
 
     const checkPassword = () => {
       const input = document.getElementById("password").value;
@@ -99,7 +106,7 @@
       document.getElementById("passwordSection").style.display = "none";
       document.getElementById("bookForm").style.display = "block";
       document.getElementById("entries").style.display = "block";
-      displayEntries(); displayTrash(); saveRoomData();
+      displayEntries(); saveRoomData();
     };
 
     const saveEntry = () => {
@@ -124,8 +131,11 @@
       const entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
       const entriesDiv = document.getElementById("entries");
       entriesDiv.innerHTML = "";
-      entries.slice().reverse().forEach((entry, i) => {
-        entriesDiv.innerHTML += 
+
+      entries.forEach((_, i) => {
+        const actualIndex = entries.length - 1 - i;
+        const entry = entries[actualIndex];
+        entriesDiv.innerHTML += `
           <div class="entry box">
             <h3>${entry.title} - ${entry.author}</h3>
             <p><strong>날짜:</strong> ${entry.date}</p>
@@ -133,22 +143,10 @@
             <p><strong>요약:</strong> ${entry.summary}</p>
             <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
             <p><strong>별점:</strong> ${entry.rating}</p>
-            ${entry.image ? <img src="${entry.image}" style='max-width:100%; margin-top:0.5rem; cursor:pointer;' onclick='openModal("${entry.image}")'/> : ""}
-            <button onclick="confirmDelete(${i})">삭제</button>
-          </div>;
-      });
-    };
-
-    const displayTrash = () => {
-      const trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
-      const trashDiv = document.getElementById("trashEntries");
-      trashDiv.innerHTML = "";
-      trash.slice().reverse().forEach((entry, i) => {
-        trashDiv.innerHTML += 
-          <div class="trash-entry box">
-            <h4>${entry.title} - ${entry.author}</h4>
-            <button onclick="restoreEntry(${i})">복구</button>
-          </div>;
+            ${entry.image ? `<img src="${entry.image}" style='max-width:100%; margin-top:0.5rem; cursor:pointer;' onclick='openModal("${entry.image}")'/>` : ""}
+            <button onclick="confirmDelete(${actualIndex})">삭제</button>
+          </div>
+        `;
       });
     };
 
@@ -160,8 +158,28 @@
         entries.splice(index, 1);
         localStorage.setItem(dataKey, JSON.stringify(entries));
         localStorage.setItem(trashKey, JSON.stringify(trash));
-        displayEntries(); displayTrash(); saveRoomData();
+        displayEntries(); saveRoomData();
       }
+    };
+
+    const toggleTrash = () => {
+      const bin = document.getElementById("trashBin");
+      bin.style.display = bin.style.display === "block" ? "none" : "block";
+      displayTrash(); saveRoomData();
+    };
+
+    const displayTrash = () => {
+      const trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
+      const trashDiv = document.getElementById("trashEntries");
+      trashDiv.innerHTML = "";
+      trash.forEach((entry, i) => {
+        trashDiv.innerHTML += `
+          <div class="trash-entry box">
+            <h4>${entry.title} - ${entry.author}</h4>
+            <button onclick="restoreEntry(${i})">복구</button>
+          </div>
+        `;
+      });
     };
 
     const restoreEntry = (index) => {
@@ -172,12 +190,6 @@
       localStorage.setItem(dataKey, JSON.stringify(entries));
       localStorage.setItem(trashKey, JSON.stringify(trash));
       displayEntries(); displayTrash(); saveRoomData();
-    };
-
-    const toggleTrash = () => {
-      const bin = document.getElementById("trashBin");
-      bin.style.display = bin.style.display === "block" ? "none" : "block";
-      displayTrash(); saveRoomData();
     };
 
     const toggleChangePassword = () => {
@@ -245,12 +257,6 @@
     };
   </script>
 
-  <div id="imageModal" onclick="closeModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-       background-color:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center;">
-    <img id="modalImage" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);
-         max-width:95%; max-height:95%; box-shadow:0 0 30px rgba(255,255,255,0.5); border-radius:10px;" />
-  </div>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
@@ -259,7 +265,7 @@
       apiKey: "AIzaSyCwf8YefXWjheKg5SYjWUqA0khJu37pMGk",
       authDomain: "chat-38c87.firebaseapp.com",
       projectId: "chat-38c87",
-      storageBucket: "chat-38c87.appspot.com",
+      storageBucket: "chat-38c87.firebasestorage.app",
       messagingSenderId: "173428820608",
       appId: "1:173428820608:web:e160cacff277f35a253465",
       measurementId: "G-KRX6BP913S"
