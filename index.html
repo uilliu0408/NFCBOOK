@@ -55,10 +55,9 @@
       </select>
       <button onclick="saveEntry()">기록 저장</button>
       <button onclick="toggleTrash()">휴지통 보기</button>
-<button onclick="toggleChangePassword()">비밀번호 변경</button>
+      <button onclick="toggleChangePassword()">비밀번호 변경</button>
     </div>
 
-    
     <div id="changePasswordSection" class="box" style="display:none;">
       <label>기존 비밀번호</label><input type="password" id="oldPassword" maxlength="4"/>
       <label>새 비밀번호</label><input type="password" id="newPassword" maxlength="4"/>
@@ -66,7 +65,7 @@
       <p id="changeMessage" style="color:red;"></p>
     </div>
 
-<hr />
+    <hr />
     <div id="entries"></div>
     <div id="trashBin" class="box">
       <h3>🗑️ 휴지통</h3>
@@ -75,10 +74,19 @@
     </div>
   </main>
 
+  <div id="imageModal" onclick="closeModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+       background-color:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center;">
+    <img id="modalImage" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);
+         max-width:95%; max-height:95%; box-shadow:0 0 30px rgba(255,255,255,0.5); border-radius:10px;" />
+  </div>
+
   <script>
-    const passKey = "password_default";
-    const dataKey = "readingEntriesNFC_default";
-    const trashKey = "trashEntries_default";
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomId = urlParams.get("id") || "default";
+
+    const passKey = `password_${roomId}`;
+    const dataKey = `readingEntriesNFC_${roomId}`;
+    const trashKey = `trashEntries_${roomId}`;
 
     const checkPassword = () => {
       const input = document.getElementById("password").value;
@@ -114,7 +122,7 @@
       entries.push(entry);
       localStorage.setItem(dataKey, JSON.stringify(entries));
       displayEntries(); saveRoomData();
-      alert("기록이 저장되었습니다!"); saveRoomData();
+      alert("기록이 저장되었습니다!");
     };
 
     const displayEntries = () => {
@@ -129,9 +137,7 @@
             <p><strong>요약:</strong> ${entry.summary}</p>
             <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
             <p><strong>별점:</strong> ${entry.rating}</p>
-            
             ${entry.image ? `<img src="${entry.image}" style='max-width:100%; margin-top:0.5rem; cursor:pointer;' onclick='openModal("${entry.image}")'/>` : ""}
-
             <button onclick="confirmDelete(${i})">삭제</button>
           </div>
         `;
@@ -177,11 +183,9 @@
       trash.splice(index, 1);
       localStorage.setItem(dataKey, JSON.stringify(entries));
       localStorage.setItem(trashKey, JSON.stringify(trash));
-      displayEntries(); saveRoomData();
-      displayTrash(); saveRoomData();
+      displayEntries(); displayTrash(); saveRoomData();
     };
 
-    
     const toggleChangePassword = () => {
       const section = document.getElementById("changePasswordSection");
       section.style.display = section.style.display === "block" ? "none" : "block";
@@ -193,12 +197,12 @@
       const storedPass = localStorage.getItem(passKey);
       if (oldPass === storedPass && newPass.length === 4) {
         localStorage.setItem(passKey, newPass);
-        document.getElementById("changeMessage").textContent = "비밀번호가 변경되었습니다."; saveRoomData();
+        document.getElementById("changeMessage").textContent = "비밀번호가 변경되었습니다.";
+        saveRoomData();
       } else {
         document.getElementById("changeMessage").textContent = "입력한 정보가 올바르지 않습니다.";
       }
     };
-
 
     let uploadedImageBase64 = "";
 
@@ -211,7 +215,6 @@
       };
       reader.readAsDataURL(file);
     };
-
 
     const openModal = (src) => {
       const modal = document.getElementById("imageModal");
@@ -226,7 +229,7 @@
       document.getElementById("modalImage").src = "";
     };
 
-const clearTrash = () => {
+    const clearTrash = () => {
       if (confirm("휴지통을 완전히 비우시겠습니까?")) {
         localStorage.setItem(trashKey, JSON.stringify([]));
         displayTrash(); saveRoomData();
@@ -234,57 +237,48 @@ const clearTrash = () => {
     };
   </script>
 
-  <div id="imageModal" onclick="closeModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-       background-color:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center;">
-    <img id="modalImage" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);
-         max-width:95%; max-height:95%; box-shadow:0 0 30px rgba(255,255,255,0.5); border-radius:10px;" />
-  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwf8YefXWjheKg5SYjWUqA0khJu37pMGk",
+      authDomain: "chat-38c87.firebaseapp.com",
+      projectId: "chat-38c87",
+      storageBucket: "chat-38c87.firebasestorage.app",
+      messagingSenderId: "173428820608",
+      appId: "1:173428820608:web:e160cacff277f35a253465",
+      measurementId: "G-KRX6BP913S"
+    };
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCwf8YefXWjheKg5SYjWUqA0khJu37pMGk",
-    authDomain: "chat-38c87.firebaseapp.com",
-    projectId: "chat-38c87",
-    storageBucket: "chat-38c87.firebasestorage.app",
-    messagingSenderId: "173428820608",
-    appId: "1:173428820608:web:e160cacff277f35a253465",
-    measurementId: "G-KRX6BP913S"
-  };
+    const getRoomRef = () => doc(db, "rooms", roomId);
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const roomId = urlParams.get("id") || "default";
-
-  const getRoomRef = () => doc(db, "rooms", roomId);
-
-  async function loadRoomData() {
-    const docSnap = await getDoc(getRoomRef());
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      if (data.entries) localStorage.setItem("readingEntriesNFC_default", JSON.stringify(data.entries));
-      if (data.trash) localStorage.setItem("trashEntries_default", JSON.stringify(data.trash));
-      if (data.password) localStorage.setItem("password_default", data.password);
+    async function loadRoomData() {
+      const docSnap = await getDoc(getRoomRef());
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.entries) localStorage.setItem(dataKey, JSON.stringify(data.entries));
+        if (data.trash) localStorage.setItem(trashKey, JSON.stringify(data.trash));
+        if (data.password) localStorage.setItem(passKey, data.password);
+      }
     }
-  }
 
-  async function saveRoomData() {
-    const entries = JSON.parse(localStorage.getItem("readingEntriesNFC_default") || "[]");
-    const trash = JSON.parse(localStorage.getItem("trashEntries_default") || "[]");
-    const password = localStorage.getItem("password_default") || "";
-    await setDoc(getRoomRef(), { entries, trash, password });
-  }
+    async function saveRoomData() {
+      const entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
+      const trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
+      const password = localStorage.getItem(passKey) || "";
+      await setDoc(getRoomRef(), { entries, trash, password });
+    }
 
-  window.saveRoomData = saveRoomData;
+    window.saveRoomData = saveRoomData;
 
-  // 처음 로드 시 Firebase에서 데이터 불러오기
-  loadRoomData();
-</script>
-
+    // 처음 로드 시 Firebase에서 데이터 불러오기
+    loadRoomData();
+  </script>
 </body>
 </html>
+
+
