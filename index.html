@@ -131,17 +131,26 @@
       const entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
       const entriesDiv = document.getElementById("entries");
       entriesDiv.innerHTML = "";
-     entries.slice().reverse().forEach((entry, i) => {
-  entriesDiv.innerHTML += `
-    <div class="entry box">
-      <h3>${entry.title} - ${entry.author}</h3>
-      <p><strong>날짜:</strong> ${entry.date}</p>
-      <p><strong>페이지:</strong> ${entry.pages}</p>
-      <p><strong>요약:</strong> ${entry.summary}</p>
-      <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
-      <p><strong>별점:</strong> ${entry.rating}</p>
-      ${entry.image ? `<img src="${entry.image}" style='max-width:100%; margin-top:0.5rem; cursor:pointer;' onclick='openModal("${entry.image}")'/>` : ""}
-      <button onclick="confirmDelete(${i})">삭제</button>
+     const displayEntries = () => {
+  const entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
+  const entriesDiv = document.getElementById("entries");
+  entriesDiv.innerHTML = "";
+
+  const reversedEntries = entries.slice().reverse();
+
+  reversedEntries.forEach((entry, i) => {
+    const actualIndex = entries.length - 1 - i;
+
+    entriesDiv.innerHTML += `
+      <div class="entry box">
+        <h3>${entry.title} - ${entry.author}</h3>
+        <p><strong>날짜:</strong> ${entry.date}</p>
+        <p><strong>페이지:</strong> ${entry.pages}</p>
+        <p><strong>요약:</strong> ${entry.summary}</p>
+        <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
+        <p><strong>별점:</strong> ${entry.rating}</p>
+        ${entry.image ? `<img src="${entry.image}" style='max-width:100%; margin-top:0.5rem; cursor:pointer;' onclick='openModal("${entry.image}")'/>` : ""}
+        <button onclick="confirmDelete(${actualIndex})">삭제</button>
           </div>
         `;
       });
