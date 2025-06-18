@@ -41,10 +41,11 @@
       <label>책 제목</label><input id="title" type="text" />
       <label>작가</label><input id="author" type="text" />
       <label>읽은 날짜</label><input id="date" type="date" />
-      <label>책 내용 요약및 읽은 쪽수</label><textarea id="summary"></textarea>
+      <label>읽은 페이지</label><input id="pages" type="text" />
+      <label>책 내용 요약</label><textarea id="summary"></textarea>
       <label>인상 깊은 문장</label><textarea id="quote"></textarea>
       
-      <label>책 관련 사진 1개</label>
+      <label>책 관련 사진</label>
       <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" />
 
       <label>별점</label>
@@ -113,6 +114,7 @@
         title: document.getElementById("title").value,
         author: document.getElementById("author").value,
         date: document.getElementById("date").value,
+        pages: document.getElementById("pages").value,
         summary: document.getElementById("summary").value,
         quote: document.getElementById("quote").value,
         rating: document.getElementById("rating").value,
@@ -134,6 +136,7 @@
           <div class="entry box">
             <h3>${entry.title} - ${entry.author}</h3>
             <p><strong>날짜:</strong> ${entry.date}</p>
+            <p><strong>페이지:</strong> ${entry.pages}</p>
             <p><strong>요약:</strong> ${entry.summary}</p>
             <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
             <p><strong>별점:</strong> ${entry.rating}</p>
@@ -209,21 +212,9 @@
     const handleImageUpload = (event) => {
       const file = event.target.files[0];
       if (!file) return;
-
-      const img = new Image();
       const reader = new FileReader();
-      reader.onload = (e) => {
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          const maxWidth = 800;
-          const scale = Math.min(1, maxWidth / img.width);
-          canvas.width = img.width * scale;
-          canvas.height = img.height * scale;
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          uploadedImageBase64 = canvas.toDataURL("image/jpeg", 0.7);
-        };
-        img.src = e.target.result;
+      reader.onload = () => {
+        uploadedImageBase64 = reader.result;
       };
       reader.readAsDataURL(file);
     };
