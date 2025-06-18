@@ -131,43 +131,34 @@
       const entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
       const entriesDiv = document.getElementById("entries");
       entriesDiv.innerHTML = "";
-     const displayEntries = () => {
-  const entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
-  const entriesDiv = document.getElementById("entries");
-  entriesDiv.innerHTML = "";
 
-  const reversedEntries = entries.slice().reverse();
-
-  reversedEntries.forEach((entry, i) => {
-    const actualIndex = entries.length - 1 - i;
-
-    entriesDiv.innerHTML += `
-      <div class="entry box">
-        <h3>${entry.title} - ${entry.author}</h3>
-        <p><strong>날짜:</strong> ${entry.date}</p>
-        <p><strong>페이지:</strong> ${entry.pages}</p>
-        <p><strong>요약:</strong> ${entry.summary}</p>
-        <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
-        <p><strong>별점:</strong> ${entry.rating}</p>
-        ${entry.image ? `<img src="${entry.image}" style='max-width:100%; margin-top:0.5rem; cursor:pointer;' onclick='openModal("${entry.image}")'/>` : ""}
-        <button onclick="confirmDelete(${actualIndex})">삭제</button>
+      entries.forEach((_, i) => {
+        const actualIndex = entries.length - 1 - i;
+        const entry = entries[actualIndex];
+        entriesDiv.innerHTML += `
+          <div class="entry box">
+            <h3>${entry.title} - ${entry.author}</h3>
+            <p><strong>날짜:</strong> ${entry.date}</p>
+            <p><strong>페이지:</strong> ${entry.pages}</p>
+            <p><strong>요약:</strong> ${entry.summary}</p>
+            <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
+            <p><strong>별점:</strong> ${entry.rating}</p>
+            ${entry.image ? `<img src="${entry.image}" style='max-width:100%; margin-top:0.5rem; cursor:pointer;' onclick='openModal("${entry.image}")'/>` : ""}
+            <button onclick="confirmDelete(${actualIndex})">삭제</button>
           </div>
         `;
       });
     };
 
-   const confirmDelete = (actualIndex) => {
-  if (confirm("휴지통으로 보내시겠습니까?")) {
-    let entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
-    let trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
-
-    trash.push(entries[actualIndex]);
-    entries.splice(actualIndex, 1);
-
-    localStorage.setItem(dataKey, JSON.stringify(entries));
-    localStorage.setItem(trashKey, JSON.stringify(trash));
-    displayEntries();
-    saveRoomData();
+    const confirmDelete = (index) => {
+      if (confirm("휴지통으로 보내시겠습니까?")) {
+        let entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
+        let trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
+        trash.push(entries[index]);
+        entries.splice(index, 1);
+        localStorage.setItem(dataKey, JSON.stringify(entries));
+        localStorage.setItem(trashKey, JSON.stringify(trash));
+        displayEntries(); saveRoomData();
       }
     };
 
@@ -222,29 +213,28 @@
     let uploadedImageBase64 = "";
 
     const handleImageUpload = (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+      const file = event.target.files[0];
+      if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      const MAX_WIDTH = 800;
-      const scaleFactor = MAX_WIDTH / img.width;
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.min(img.width, MAX_WIDTH);
-      canvas.height = img.height * scaleFactor;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX_WIDTH = 800;
+          const scaleFactor = MAX_WIDTH / img.width;
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.min(img.width, MAX_WIDTH);
+          canvas.height = img.height * scaleFactor;
 
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      // JPEG 압축 (0.7 = 70% 품질)
-      uploadedImageBase64 = canvas.toDataURL("image/jpeg", 0.7);
+          uploadedImageBase64 = canvas.toDataURL("image/jpeg", 0.7);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-};
 
     const openModal = (src) => {
       const modal = document.getElementById("imageModal");
@@ -309,3 +299,4 @@
   </script>
 </body>
 </html>
+
