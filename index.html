@@ -149,9 +149,9 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get("id") || "default";
-    const passKey = `password_${roomId}`;
-    const dataKey = `readingEntriesNFC_${roomId}`;
-    const trashKey = `trashEntries_${roomId}`;
+   const passKey = `password_${roomId}`;
+const dataKey = `readingEntriesNFC_${roomId}`;
+const trashKey = `trashEntries_${roomId}`;
 
     const checkPassword = () => {
       const input = document.getElementById("password").value;
