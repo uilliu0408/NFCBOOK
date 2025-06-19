@@ -236,31 +236,30 @@ const trashKey = `trashEntries_${roomId}`;
 
 
     const displayEntries = async () => {
-  const entriesRef = collection(db, "rooms", roomId, "entries");
-  const snapshot = await getDocs(entriesRef);
+  const roomRef = firestoreDoc(db, "rooms", roomId);
+  const docSnap = await firestoreGet(roomRef);
   const div = document.getElementById("entries");
   div.innerHTML = "";
 
-  const entries = [];
-  snapshot.forEach((docSnap) => {
-    entries.push({ id: docSnap.id, ...docSnap.data() });
-  });
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    const entries = data.entries || [];
 
-  entries.sort((a, b) => b.timestamp - a.timestamp); // 최신순 정렬
-
-  entries.forEach((entry, index) => {
-    div.innerHTML += `
-      <div class="entry box">
-        <h3>${entry.title} - ${entry.author}</h3>
-        <p><strong>날짜:</strong> ${entry.date}</p>
-        <p><strong>페이지:</strong> ${entry.pages}</p>
-        <p><strong>요약:</strong> ${entry.summary}</p>
-        <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
-        <p><strong>별점:</strong> ${entry.rating}</p>
-        ${entry.image ? `<img src="${entry.image}" style='max-width:100%;' onclick='openModal("${entry.image}")'/>` : ""}
-      </div>`;
-  });
+    entries.slice().reverse().forEach((entry) => {
+      div.innerHTML += `
+        <div class="entry box">
+          <h3>${entry.title} - ${entry.author}</h3>
+          <p><strong>날짜:</strong> ${entry.date}</p>
+          <p><strong>페이지:</strong> ${entry.pages}</p>
+          <p><strong>요약:</strong> ${entry.summary}</p>
+          <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
+          <p><strong>별점:</strong> ${entry.rating}</p>
+          ${entry.image ? `<img src="${entry.image}" style='max-width:100%;' onclick='openModal("${entry.image}")'/>` : ""}
+        </div>`;
+    });
+  }
 };
+
 
 
     const displayTrash = async () => {
