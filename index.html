@@ -4,6 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NFC 독서기록장</title>
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCwf8YefXWjheKg5SYjWUqA0khJu37pMGk",
+    authDomain: "chat-38c87.firebaseapp.com",
+    projectId: "chat-38c87",
+    storageBucket: "chat-38c87.firebasestorage.app",
+    messagingSenderId: "173428820608",
+    appId: "1:173428820608:web:e89fb8d19cc4e35c253465",
+    measurementId: "G-5340BFY1RL"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+
+  const db = getFirestore(app);
+window.db = db;
+window.firestoreDoc = doc;
+window.firestoreGet = getDoc;
+window.firestoreSet = setDoc;
+window.firestoreUpdate = updateDoc;
+</script>
  <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+KR:wght@300;500&display=swap');
 
@@ -174,81 +206,119 @@ const trashKey = `trashEntries_${roomId}`;
       document.getElementById("entries").style.display = "block";
     };
 
-    const saveEntry = () => {
-      const entry = {
-        title: document.getElementById("title").value,
-        author: document.getElementById("author").value,
-        date: document.getElementById("date").value,
-        pages: document.getElementById("pages").value,
-        summary: document.getElementById("summary").value,
-        quote: document.getElementById("quote").value,
-        rating: document.getElementById("rating").value,
-        image: uploadedImageBase64
-      };
-      let entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
-      entries.push(entry);
-      localStorage.setItem(dataKey, JSON.stringify(entries));
-      displayEntries();
-      alert("기록이 저장되었습니다!");
-    };
+    const saveEntry = async () => {
+  const entry = {
+    title: document.getElementById("title").value,
+    author: document.getElementById("author").value,
+    date: document.getElementById("date").value,
+    pages: document.getElementById("pages").value,
+    summary: document.getElementById("summary").value,
+    quote: document.getElementById("quote").value,
+    rating: document.getElementById("rating").value,
+    image: uploadedImageBase64,
+    timestamp: Date.now()
+  };
 
-    const displayEntries = () => {
-      const entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
-      const div = document.getElementById("entries");
-      div.innerHTML = "";
-      entries.slice().reverse().forEach((entry, i, arr) => {
-        const trueIndex = arr.length - 1 - i;
-        div.innerHTML += `
-          <div class="entry box">
-            <h3>${entry.title} - ${entry.author}</h3>
-            <p><strong>날짜:</strong> ${entry.date}</p>
-            <p><strong>페이지:</strong> ${entry.pages}</p>
-            <p><strong>요약:</strong> ${entry.summary}</p>
-            <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
-            <p><strong>별점:</strong> ${entry.rating}</p>
-            ${entry.image ? `<img src="${entry.image}" style='max-width:100%;' onclick='openModal("${entry.image}")'/>` : ""}
-            <button onclick="confirmDelete(${trueIndex})">삭제</button>
-          </div>`;
-      });
-    };
+  const entryId = `${Date.now()}`;
+  await firestoreSet(firestoreDoc(db, "rooms", roomId, "entries", entryId), entry);
+  alert("기록이 저장되었습니다!");
+  displayEntries();
+};
 
-    const displayTrash = () => {
-      const trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
-      const div = document.getElementById("trashEntries");
-      div.innerHTML = "";
-      trash.slice().reverse().forEach((entry, i, arr) => {
-        const trueIndex = arr.length - 1 - i;
-        div.innerHTML += `
-          <div class="trash-entry box">
-            <h4>${entry.title} - ${entry.author}</h4>
-            <button onclick="restoreEntry(${trueIndex})">복구</button>
-          </div>`;
-      });
-    };
+    const displayEntries = async () => {
+  const entriesRef = collection(db, "rooms", roomId, "entries");
+  const snapshot = await getDocs(entriesRef);
+  const div = document.getElementById("entries");
+  div.innerHTML = "";
 
-    const confirmDelete = (index) => {
-      if (confirm("휴지통으로 보낼까요?")) {
-        let entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
-        let trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
-        trash.push(entries[index]);
-        entries.splice(index, 1);
-        localStorage.setItem(dataKey, JSON.stringify(entries));
-        localStorage.setItem(trashKey, JSON.stringify(trash));
-        displayEntries();
-        displayTrash();
-      }
-    };
+  const entries = [];
+  snapshot.forEach((docSnap) => {
+    entries.push({ id: docSnap.id, ...docSnap.data() });
+  });
 
-    const restoreEntry = (index) => {
-      let trash = JSON.parse(localStorage.getItem(trashKey) || "[]");
-      let entries = JSON.parse(localStorage.getItem(dataKey) || "[]");
-      entries.push(trash[index]);
-      trash.splice(index, 1);
-      localStorage.setItem(dataKey, JSON.stringify(entries));
-      localStorage.setItem(trashKey, JSON.stringify(trash));
-      displayEntries();
-      displayTrash();
-    };
+  entries.sort((a, b) => b.timestamp - a.timestamp); // 최신순 정렬
+
+  entries.forEach((entry, index) => {
+    div.innerHTML += `
+      <div class="entry box">
+        <h3>${entry.title} - ${entry.author}</h3>
+        <p><strong>날짜:</strong> ${entry.date}</p>
+        <p><strong>페이지:</strong> ${entry.pages}</p>
+        <p><strong>요약:</strong> ${entry.summary}</p>
+        <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
+        <p><strong>별점:</strong> ${entry.rating}</p>
+        ${entry.image ? `<img src="${entry.image}" style='max-width:100%;' onclick='openModal("${entry.image}")'/>` : ""}
+      </div>`;
+  });
+};
+
+
+    const displayTrash = async () => {
+  const roomRef = firestoreDoc(db, "rooms", roomId);
+  const docSnap = await firestoreGet(roomRef);
+  if (!docSnap.exists()) return;
+
+  const data = docSnap.data();
+  const trash = data.trash || [];
+
+  const div = document.getElementById("trashEntries");
+  div.innerHTML = "";
+  trash.slice().reverse().forEach((entry, i, arr) => {
+    const trueIndex = arr.length - 1 - i;
+    div.innerHTML += `
+      <div class="trash-entry box">
+        <h4>${entry.title} - ${entry.author}</h4>
+        <button onclick="restoreEntry(${trueIndex})">복구</button>
+      </div>`;
+  });
+};
+
+
+    const confirmDelete = async (index) => {
+  if (!confirm("휴지통으로 보낼까요?")) return;
+
+  const roomRef = firestoreDoc(db, "rooms", roomId);
+  const docSnap = await firestoreGet(roomRef);
+  if (docSnap.exists()) {
+    let data = docSnap.data();
+    let entries = data.entries || [];
+    let trash = data.trash || [];
+
+    const deleted = entries.splice(index, 1)[0]; // 삭제할 항목
+    trash.push(deleted);
+
+    await firestoreUpdate(roomRef, {
+      entries: entries,
+      trash: trash
+    });
+
+    displayEntries();
+    displayTrash();
+  }
+};
+
+
+    const restoreEntry = async (index) => {
+  const roomRef = firestoreDoc(db, "rooms", roomId);
+  const docSnap = await firestoreGet(roomRef);
+  if (!docSnap.exists()) return;
+
+  let data = docSnap.data();
+  let entries = data.entries || [];
+  let trash = data.trash || [];
+
+  const restored = trash.splice(index, 1)[0]; // 복구할 항목 꺼내기
+  entries.push(restored);
+
+  await firestoreUpdate(roomRef, {
+    entries: entries,
+    trash: trash
+  });
+
+  displayEntries();
+  displayTrash();
+};
+
 
     const toggleTrash = () => {
       const bin = document.getElementById("trashBin");
@@ -312,12 +382,17 @@ const trashKey = `trashEntries_${roomId}`;
       document.getElementById("modalImage").src = "";
     };
 
-    const clearTrash = () => {
-      if (confirm("휴지통을 완전히 비울까요?")) {
-        localStorage.setItem(trashKey, JSON.stringify([]));
-        displayTrash();
-      }
-    };
+    const clearTrash = async () => {
+  if (!confirm("휴지통을 완전히 비울까요?")) return;
+
+  const roomRef = firestoreDoc(db, "rooms", roomId);
+  await firestoreUpdate(roomRef, {
+    trash: []
+  });
+
+  displayTrash();
+};
+
   </script>
 </body>
 </html>
