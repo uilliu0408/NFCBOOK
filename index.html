@@ -215,15 +215,25 @@ const trashKey = `trashEntries_${roomId}`;
     summary: document.getElementById("summary").value,
     quote: document.getElementById("quote").value,
     rating: document.getElementById("rating").value,
-    image: uploadedImageBase64,
-    timestamp: Date.now()
+    image: uploadedImageBase64
   };
 
-  const entryId = `${Date.now()}`;
-  await firestoreSet(firestoreDoc(db, "rooms", roomId, "entries", entryId), entry);
+  const roomRef = firestoreDoc(db, "rooms", roomId);
+  const docSnap = await firestoreGet(roomRef);
+  let entries = [];
+
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    entries = data.entries || [];
+  }
+
+  entries.push(entry);
+
+  await firestoreSet(roomRef, { entries: entries }, { merge: true });
   alert("기록이 저장되었습니다!");
   displayEntries();
 };
+
 
     const displayEntries = async () => {
   const entriesRef = collection(db, "rooms", roomId, "entries");
