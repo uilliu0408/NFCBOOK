@@ -37,180 +37,99 @@ window.firestoreSet = setDoc;
 window.firestoreUpdate = updateDoc;
 </script>
  <style>
-@import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=Gowun+Batang:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap');
 
+/* --------------------
+   🎄 크리스마스 배경
+---------------------*/
 body {
+  font-family: 'Noto Serif KR', serif;
   margin: 0;
   padding: 0;
-  font-family: 'Gowun Batang', serif;
-  color: #fefefe;
-  background: url('https://images.unsplash.com/photo-1608889175152-67f2adf9bb9a?auto=format&fit=crop&w=1600&q=80')
+  color: #eee;
+  background: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMSEhISEhIWFRUVFRUVFxUVFRUVFRUVFhUVFRUVFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMsNygtLisBCgoKDg0OGxAQGy0lICUvLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAWgB4AMBIgACEQEDEQH/...<생략: 너무 길어서 메시지에 다 못 담음>...') 
               no-repeat center center fixed;
   background-size: cover;
+  position: relative;
   overflow-x: hidden;
-  position: relative;
 }
 
-/* ✨ 따뜻한 황금빛 필터 */
+/* 🔔 은은한 어둠과 블러 */
 body::before {
-  content: "";
+  content: '';
   position: fixed;
   top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(3px);
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(2px);
+  background: rgba(0,0,0,0.25);
+  pointer-events: none;
   z-index: 0;
-  pointer-events: none;
 }
 
-/* ❄️ 눈송이 애니메이션 1 (큰 눈) */
-.snow-large {
-  pointer-events: none;
+/* ❄ 눈 내리는 애니메이션 */
+.snow {
   position: fixed;
   top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-image: url("https://cdn-icons-png.flaticon.com/512/2315/2315357.png");
-  background-size: 80px;
-  opacity: 0.4;
-  animation: snowfallLarge 12s linear infinite;
-  z-index: 1;
-}
-
-@keyframes snowfallLarge {
-  0% { transform: translateY(-100px); }
-  100% { transform: translateY(100vh); }
-}
-
-/* ❄️ 눈송이 애니메이션 2 (작은 눈) */
-.snow-small {
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-image: url("https://cdn-icons-png.flaticon.com/512/616/616490.png");
-  background-size: 25px;
-  opacity: 0.6;
-  animation: snowfallSmall 8s linear infinite;
-  z-index: 2;
+  z-index: 3;
+  background-image:
+    radial-gradient(white 2px, transparent 2px),
+    radial-gradient(white 1.5px, transparent 2px),
+    radial-gradient(white 1px, transparent 2px);
+  background-size: 8px 8px, 6px 6px, 4px 4px;
+  animation: snowfall 18s linear infinite;
+  opacity: 0.65;
 }
 
-@keyframes snowfallSmall {
-  0% { transform: translateY(-100px) translateX(0); }
-  100% { transform: translateY(100vh) translateX(40px); }
+@keyframes snowfall {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(600px); }
 }
 
-/* 🎄 상단 헤더 */
+/* --------------------
+   📦 컨테이너 스타일
+---------------------*/
 header {
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  padding: 1.2rem;
+  text-align: center;
+  font-size: 1.4rem;
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
   position: relative;
-  background: rgba(255,255,255,0.23);
-  color: #fff9f2;
-  text-shadow: 0 0 10px rgba(255,220,170,0.8);
-  backdrop-filter: blur(8px);
-  padding: 1.5rem 1rem;
-  font-size: 1.6rem;
-  letter-spacing: 2px;
-  border-bottom: 1px solid rgba(255,255,255,0.3);
-  z-index: 10;
+  z-index: 5;
 }
 
-/* 🎁 메인 컨테이너 */
 main {
-  max-width: 860px;
-  margin: auto;
   padding: 1.5rem;
+  max-width: 820px;
+  margin: auto;
   position: relative;
   z-index: 10;
 }
 
-/* 🎄 아늑한 카드 박스 */
 .box {
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(12px);
-  padding: 1.6rem;
-  margin-bottom: 1.6rem;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.28);
-  box-shadow:
-    0 6px 18px rgba(0,0,0,0.35),
-    0 0 18px rgba(255,210,150,0.4);
-  animation: boxFade 0.45s ease;
-}
-
-@keyframes boxFade {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0);   }
-}
-
-/* 📘 입력 요소 */
-input, textarea, select {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  margin-top: 0.8rem;
-  font-size: 1rem;
-  border-radius: 12px;
-  border: none;
-  outline: none;
-  background: rgba(255,255,255,0.85);
-  color: #333;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.18);
-  font-family: 'Nanum Myeongjo', serif;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 95px;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #666;
-}
-
-/* 🎅 버튼 스타일 */
-button {
-  width: 100%;
-  margin-top: 1rem;
-  padding: 0.85rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 12px;
-  border: none;
-  background: linear-gradient(135deg, #dfbd88, #caa26b);
-  color: #3b2b1e;
-  box-shadow:
-    0 3px 12px rgba(0,0,0,0.35),
-    inset 0 0 10px rgba(255,255,255,0.4);
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
-button:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, #e8c894, #b48a52);
-  box-shadow:
-    0 6px 20px rgba(0,0,0,0.4),
-    inset 0 0 14px rgba(255,255,255,0.45);
-}
-
-/* 🎁 개별 기록 */
-.entry img {
-  width: 100%;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(7px);
   border-radius: 14px;
-  margin-top: 0.6rem;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-  cursor: pointer;
+  padding: 1.5rem;
+  margin-bottom: 1.4rem;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+  animation: fadeIn 0.4s ease;
 }
 
-/* 숨김 요소 */
-#entries, #trashBin, #bookForm {
-  display: none;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0px); }
 }
 
-/* 모달 이미지 */
-#imageModal img {
-  border-radius: 16px;
-  box-shadow: 0 0 35px rgba(255,230,200,0.45);
-}
+/* --------------------
+   입력창
 
 
 </style>
@@ -501,6 +420,7 @@ const trashKey = `trashEntries_${roomId}`;
   </script>
 </body>
 </html>
+
 
 
 
