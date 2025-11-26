@@ -39,22 +39,19 @@ window.firestoreUpdate = updateDoc;
  <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap');
 
-/* --------------------
-   🎄 크리스마스 배경
----------------------*/
 body {
   font-family: 'Noto Serif KR', serif;
   margin: 0;
   padding: 0;
   color: #eee;
-  background: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMSEhISEhIWFRUVFRUVFxUVFRUVFRUVFhUVFRUVFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMsNygtLisBCgoKDg0OGxAQGy0lICUvLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAWgB4AMBIgACEQEDEQH/...<생략: 너무 길어서 메시지에 다 못 담음>...') 
+  background: url('https://images.unsplash.com/photo-1543589077-47d81606c1bf?auto=format&fit=crop&w=1600&q=80')
               no-repeat center center fixed;
   background-size: cover;
   position: relative;
   overflow-x: hidden;
 }
 
-/* 🔔 은은한 어둠과 블러 */
+/* 부드러운 안개 효과 */
 body::before {
   content: '';
   position: fixed;
@@ -67,39 +64,35 @@ body::before {
   z-index: 0;
 }
 
-/* ❄ 눈 내리는 애니메이션 */
-.snow {
+/* 잔잔한 눈(꽃가루) 효과 */
+.forest-dust {
   position: fixed;
   top: 0; left: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
   z-index: 3;
-  background-image:
-    radial-gradient(white 2px, transparent 2px),
-    radial-gradient(white 1.5px, transparent 2px),
-    radial-gradient(white 1px, transparent 2px);
-  background-size: 8px 8px, 6px 6px, 4px 4px;
-  animation: snowfall 18s linear infinite;
-  opacity: 0.65;
+  background-image: 
+    radial-gradient(rgba(255,255,255,0.8) 2px, transparent 2px),
+    radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px);
+  background-size: 6px 6px, 4px 4px;
+  animation: floatDust 18s linear infinite;
+  opacity: 0.6;
 }
 
-@keyframes snowfall {
+@keyframes floatDust {
   0% { transform: translateY(0px); }
-  100% { transform: translateY(600px); }
+  100% { transform: translateY(800px); }
 }
 
-/* --------------------
-   📦 컨테이너 스타일
----------------------*/
 header {
-  background: rgba(0,0,0,0.6);
+  background: rgba(20, 20, 20, 0.55);
   backdrop-filter: blur(6px);
-  padding: 1.2rem;
   text-align: center;
+  padding: 1.2rem 1rem;
+  color: #f0f0f0;
   font-size: 1.4rem;
-  color: #fff;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
+  border-bottom: 1px solid rgba(255,255,255,0.15);
   position: relative;
   z-index: 5;
 }
@@ -113,13 +106,13 @@ main {
 }
 
 .box {
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(7px);
-  border-radius: 14px;
+  background: rgba(40, 40, 40, 0.55);
+  backdrop-filter: blur(8px);
+  border-radius: 15px;
   padding: 1.5rem;
   margin-bottom: 1.4rem;
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.35);
   animation: fadeIn 0.4s ease;
 }
 
@@ -128,8 +121,62 @@ main {
   to { opacity: 1; transform: translateY(0px); }
 }
 
-/* --------------------
-   입력창
+input, textarea, select {
+  width: 100%;
+  margin: 0.6rem auto 1rem;
+  padding: 0.7rem;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255,255,255,0.85);
+  color: #2b2b2b;
+  font-size: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+input::placeholder, textarea::placeholder {
+  color: #7a7a7a;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+button {
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 0.7rem;
+  border: none;
+  border-radius: 12px;
+  background: #d8b58a;
+  color: #2e2b26;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+  transition: 0.2s ease;
+}
+
+button:hover {
+  background: #c9a476;
+  transform: translateY(-2px);
+}
+
+.entry img, .trash-entry img {
+  border-radius: 14px;
+  max-width: 100%;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+  cursor: pointer;
+}
+
+#entries, #trashBin, #bookForm {
+  display: none;
+}
+
+
+
+
 
 
 </style>
@@ -420,6 +467,7 @@ const trashKey = `trashEntries_${roomId}`;
   </script>
 </body>
 </html>
+
 
 
 
