@@ -51,6 +51,14 @@ body {
   overflow-x: hidden;
 }
 
+/* 📌 모바일에서 배경 너무 확대 → contain 적용 */
+@media (max-width: 600px) {
+  body {
+    background-size: contain;
+    background-color: #000;
+  }
+}
+
 /* 부드러운 안개 효과 */
 body::before {
   content: '';
@@ -64,7 +72,7 @@ body::before {
   z-index: 0;
 }
 
-/* 잔잔한 눈(꽃가루) 효과 */
+/* 눈 효과 */
 .forest-dust {
   position: fixed;
   top: 0; left: 0;
@@ -85,16 +93,25 @@ body::before {
   100% { transform: translateY(800px); }
 }
 
+/* 📌 제목 수정 — 크기 줄임 + 내용 변경 */
 header {
   background: rgba(20, 20, 20, 0.55);
   backdrop-filter: blur(6px);
   text-align: center;
-  padding: 1.2rem 1rem;
+  padding: 0.8rem 1rem;
   color: #f0f0f0;
-  font-size: 1.4rem;
+  font-size: 1.2rem; /* 모바일에서 1줄 유지 */
+  letter-spacing: 1px;
   border-bottom: 1px solid rgba(255,255,255,0.15);
   position: relative;
   z-index: 5;
+}
+
+@media (max-width: 600px) {
+  header {
+    font-size: 1.05rem;
+    padding: 0.6rem;
+  }
 }
 
 main {
@@ -121,8 +138,10 @@ main {
   to { opacity: 1; transform: translateY(0px); }
 }
 
+/* 📌 입력칸 삐져나옴 해결: box-sizing 적용 */
 input, textarea, select {
   width: 100%;
+  max-width: 100%;
   margin: 0.6rem auto 1rem;
   padding: 0.7rem;
   border-radius: 10px;
@@ -131,6 +150,7 @@ input, textarea, select {
   color: #2b2b2b;
   font-size: 1rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-sizing: border-box; /* ← 문제 해결 핵심 */
 }
 
 input::placeholder, textarea::placeholder {
@@ -466,7 +486,7 @@ const trashKey = `trashEntries_${roomId}`;
 
   </script>
 </body>
-</html>
+</html> 
 
 
 
