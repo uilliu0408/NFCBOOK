@@ -4,217 +4,221 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NFC 독서기록장</title>
+
+  <!-- Firebase SDK -->
   <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwf8YefXWjheKg5SYjWUqA0khJu37pMGk",
+      authDomain: "chat-38c87.firebaseapp.com",
+      projectId: "chat-38c87",
+      storageBucket: "chat-38c87.firebasestorage.app",
+      messagingSenderId: "173428820608",
+      appId: "1:173428820608:web:e89fb8d19cc4e35c253465",
+      measurementId: "G-5340BFY1RL"
+    };
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCwf8YefXWjheKg5SYjWUqA0khJu37pMGk",
-    authDomain: "chat-38c87.firebaseapp.com",
-    projectId: "chat-38c87",
-    storageBucket: "chat-38c87.firebasestorage.app",
-    messagingSenderId: "173428820608",
-    appId: "1:173428820608:web:e89fb8d19cc4e35c253465",
-    measurementId: "G-5340BFY1RL"
-  };
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+    window.db = db;
+    window.firestoreDoc = doc;
+    window.firestoreGet = getDoc;
+    window.firestoreSet = setDoc;
+    window.firestoreUpdate = updateDoc;
+  </script>
 
-  const db = getFirestore(app);
-window.db = db;
-window.firestoreDoc = doc;
-window.firestoreGet = getDoc;
-window.firestoreSet = setDoc;
-window.firestoreUpdate = updateDoc;
-</script>
- <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap');
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap');
 
-body {
-  font-family: 'Noto Serif KR', serif;
-  margin: 0;
-  padding: 0;
-  color: #eee;
-  background: url('https://images.unsplash.com/photo-1543589077-47d81606c1bf?auto=format&fit=crop&w=1600&q=80')
-              no-repeat center center fixed;
-  background-size: cover;
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* 📌 모바일에서 배경 너무 확대 → contain 적용 */
-@media (max-width: 600px) {
   body {
-    background-size: contain;
-    background-color: #000;
+    font-family: 'Noto Serif KR', serif;
+    margin: 0;
+    padding: 0;
+    color: #eee;
+    background: url('https://images.unsplash.com/photo-1543589077-47d81606c1bf?auto=format&fit=crop&w=1600&q=80')
+                no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+    overflow-x: hidden;
   }
-}
 
-/* 부드러운 안개 효과 */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(2px);
-  background: rgba(0,0,0,0.25);
-  pointer-events: none;
-  z-index: 0;
-}
+  /* 📌 모바일에서 배경 너무 확대 → contain 적용 */
+  @media (max-width: 600px) {
+    body {
+      background-size: contain;
+      background-color: #000;
+    }
+  }
 
-/* 눈 효과 */
-.forest-dust {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 3;
-  background-image: 
-    radial-gradient(rgba(255,255,255,0.8) 2px, transparent 2px),
-    radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px);
-  background-size: 6px 6px, 4px 4px;
-  animation: floatDust 18s linear infinite;
-  opacity: 0.6;
-}
+  /* 부드러운 안개 효과 */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(2px);
+    background: rgba(0,0,0,0.25);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-@keyframes floatDust {
-  0% { transform: translateY(0px); }
-  100% { transform: translateY(800px); }
-}
+  /* 눈 효과 */
+  .forest-dust {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+    background-image: 
+      radial-gradient(rgba(255,255,255,0.8) 2px, transparent 2px),
+      radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px);
+    background-size: 6px 6px, 4px 4px;
+    animation: floatDust 18s linear infinite;
+    opacity: 0.6;
+  }
 
-/* 📌 제목 수정 — 크기 줄임 + 내용 변경 */
-header {
-  background: rgba(20, 20, 20, 0.55);
-  backdrop-filter: blur(6px);
-  text-align: center;
-  padding: 0.8rem 1rem;
-  color: #f0f0f0;
-  font-size: 1.2rem; /* 모바일에서 1줄 유지 */
-  letter-spacing: 1px;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
-  position: relative;
-  z-index: 5;
-}
+  @keyframes floatDust {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(800px); }
+  }
 
-@media (max-width: 600px) {
+  /* 📌 제목 크기 줄이고, 내용 변경 */
   header {
-    font-size: 1.05rem;
-    padding: 0.6rem;
+    background: rgba(20, 20, 20, 0.55);
+    backdrop-filter: blur(6px);
+    text-align: center;
+    padding: 0.8rem 1rem;
+    color: #f0f0f0;
+    font-size: 1.2rem; /* 모바일에서 1줄 유지용 */
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    position: relative;
+    z-index: 5;
   }
-}
 
-main {
-  padding: 1.5rem;
-  max-width: 820px;
-  margin: auto;
-  position: relative;
-  z-index: 10;
-}
+  @media (max-width: 600px) {
+    header {
+      font-size: 1.05rem;
+      padding: 0.6rem;
+    }
+  }
 
-.box {
-  background: rgba(40, 40, 40, 0.55);
-  backdrop-filter: blur(8px);
-  border-radius: 15px;
-  padding: 1.5rem;
-  margin-bottom: 1.4rem;
-  border: 1px solid rgba(255,255,255,0.15);
-  box-shadow: 0 6px 25px rgba(0,0,0,0.35);
-  animation: fadeIn 0.4s ease;
-}
+  main {
+    padding: 1.5rem;
+    max-width: 820px;
+    margin: auto;
+    position: relative;
+    z-index: 10;
+  }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0px); }
-}
+  .box {
+    background: rgba(40, 40, 40, 0.55);
+    backdrop-filter: blur(8px);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.4rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.35);
+    animation: fadeIn 0.4s ease;
+  }
 
-/* 📌 입력칸 삐져나옴 해결: box-sizing 적용 */
-input, textarea, select {
-  width: 100%;
-  max-width: 100%;
-  margin: 0.6rem auto 1rem;
-  padding: 0.7rem;
-  border-radius: 10px;
-  border: none;
-  background: rgba(255,255,255,0.85);
-  color: #2b2b2b;
-  font-size: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  box-sizing: border-box; /* ← 문제 해결 핵심 */
-}
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0px); }
+  }
 
-input::placeholder, textarea::placeholder {
-  color: #7a7a7a;
-}
+  /* 📌 입력칸 삐져나옴 해결: box-sizing 적용 */
+  input, textarea, select {
+    width: 100%;
+    max-width: 100%;
+    margin: 0.6rem auto 1rem;
+    padding: 0.7rem;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.85);
+    color: #2b2b2b;
+    font-size: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    box-sizing: border-box; /* 핵심 */
+  }
 
-textarea {
-  resize: vertical;
-  min-height: 90px;
-}
+  input::placeholder, textarea::placeholder {
+    color: #7a7a7a;
+  }
 
-button {
-  width: 100%;
-  padding: 0.8rem;
-  margin-top: 0.7rem;
-  border: none;
-  border-radius: 12px;
-  background: #d8b58a;
-  color: #2e2b26;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.25);
-  transition: 0.2s ease;
-}
+  textarea {
+    resize: vertical;
+    min-height: 90px;
+  }
 
-button:hover {
-  background: #c9a476;
-  transform: translateY(-2px);
-}
+  button {
+    width: 100%;
+    padding: 0.8rem;
+    margin-top: 0.7rem;
+    border: none;
+    border-radius: 12px;
+    background: #d8b58a;
+    color: #2e2b26;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: 0.2s ease;
+  }
 
-.entry img, .trash-entry img {
-  border-radius: 14px;
-  max-width: 100%;
-  margin-top: 0.5rem;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.4);
-  cursor: pointer;
-}
+  button:hover {
+    background: #c9a476;
+    transform: translateY(-2px);
+  }
 
-#entries, #trashBin, #bookForm {
-  display: none;
-}
+  .entry img, .trash-entry img {
+    border-radius: 14px;
+    max-width: 100%;
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+    cursor: pointer;
+  }
 
-
-
-
-
-
-</style>
-
-
+  #entries, #trashBin, #bookForm {
+    display: none;
+  }
+  </style>
 </head>
 <body>
+  <!-- 눈 효과 레이어 (선택 사항) -->
+  <div class="forest-dust"></div>
+
   <header>
-    <h1>🗂️ NFC 독서기록장</h1>
+    <h1>🎄독서기록장🎄</h1>
   </header>
+
   <main>
+    <!-- 🔐 비밀번호 섹션 -->
     <div class="box" id="passwordSection">
-      <label>비밀번호를 입력하거나 새로 만들어주세요.</label>
-      <input type="password" id="password" maxlength="4" />
+      <label id="passwordLabel">비밀번호를 불러오는 중입니다...</label>
+      <input type="password" id="password" maxlength="4" placeholder="4자리 숫자" />
+
+      <!-- 새 방일 때만 보이는 비밀번호 확인 -->
+      <div id="passwordConfirmWrapper" style="display:none;">
+        <label>비밀번호 확인</label>
+        <input type="password" id="passwordConfirm" maxlength="4" placeholder="다시 한 번 입력" />
+      </div>
+
       <button onclick="checkPassword()">접속</button>
-      <p id="passMsg" style="color:red;"></p>
+      <p id="passMsg" style="color:#ff9e9e;"></p>
     </div>
 
+    <!-- 📚 기록 입력 폼 -->
     <div id="bookForm" class="box">
       <label>책 제목</label><input id="title" type="text" />
       <label>작가</label><input id="author" type="text" />
@@ -235,22 +239,26 @@ button:hover {
       <button onclick="toggleChangePassword()">비밀번호 변경</button>
     </div>
 
+    <!-- 🔐 비밀번호 변경 섹션 -->
     <div id="changePasswordSection" class="box" style="display:none;">
       <label>기존 비밀번호</label><input type="password" id="oldPassword" maxlength="4"/>
       <label>새 비밀번호</label><input type="password" id="newPassword" maxlength="4"/>
       <button onclick="changePassword()">비밀번호 변경</button>
-      <p id="changeMessage" style="color:red;"></p>
+      <p id="changeMessage" style="color:#ffdfdf;"></p>
     </div>
 
+    <!-- 🗑 휴지통 -->
     <div id="trashBin" class="box">
       <h3>🗑️ 휴지통</h3>
       <div id="trashEntries"></div>
       <button onclick="clearTrash()">휴지통 비우기</button>
     </div>
 
+    <!-- 📄 기록 목록 -->
     <div id="entries"></div>
   </main>
 
+  <!-- 이미지 모달 -->
   <div id="imageModal" onclick="closeModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
        background-color:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center;">
     <img id="modalImage" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);
@@ -260,20 +268,115 @@ button:hover {
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get("id") || "default";
-   const passKey = `password_${roomId}`;
-const dataKey = `readingEntriesNFC_${roomId}`;
-const trashKey = `trashEntries_${roomId}`;
 
-    const checkPassword = () => {
-      const input = document.getElementById("password").value;
-      const stored = localStorage.getItem(passKey);
-      if (!stored) {
-        localStorage.setItem(passKey, input);
-        showMain();
-      } else if (input === stored) {
-        showMain();
+    // 예전 localStorage용 키 (지금은 사용 X, 그냥 둬도 문제 없음)
+    const passKey  = `password_${roomId}`;
+    const dataKey  = `readingEntriesNFC_${roomId}`;
+    const trashKey = `trashEntries_${roomId}`;
+
+    // 🔐 Firestore 기반 비밀번호 관리용 상태
+    let isNewRoom = false;          // true면 새 방 → 비번 설정 모드
+    let roomPasswordCache = null;   // Firestore에서 읽어온 비번 캐시
+
+    // 🔐 페이지 로드시, 이 방의 비밀번호 유무 확인
+    const initPasswordUI = async () => {
+      const labelEl = document.getElementById("passwordLabel");
+      const confirmWrap = document.getElementById("passwordConfirmWrapper");
+      const passMsg = document.getElementById("passMsg");
+
+      try {
+        const roomRef = firestoreDoc(db, "rooms", roomId);
+        const docSnap = await firestoreGet(roomRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.password) {
+            // ✅ 이미 비밀번호가 있는 방
+            isNewRoom = false;
+            roomPasswordCache = data.password;
+            if (labelEl) labelEl.textContent = "비밀번호를 입력해주세요.";
+            if (confirmWrap) confirmWrap.style.display = "none";
+          } else {
+            // 🔑 방은 있지만 비번이 없는 경우 → 새 방 취급
+            isNewRoom = true;
+            if (labelEl) labelEl.textContent = "비밀번호를 설정해주세요.";
+            if (confirmWrap) confirmWrap.style.display = "block";
+          }
+        } else {
+          // 🆕 완전 새로운 방
+          isNewRoom = true;
+          if (labelEl) labelEl.textContent = "비밀번호를 설정해주세요.";
+          if (confirmWrap) confirmWrap.style.display = "block";
+        }
+      } catch (e) {
+        console.error(e);
+        if (labelEl) labelEl.textContent = "오류가 발생했습니다. 새로고침 해주세요.";
+        if (passMsg) passMsg.textContent = "네트워크 또는 Firestore 오류입니다.";
+      }
+    };
+
+    // 🔐 비밀번호 체크 / 설정
+    const checkPassword = async () => {
+      const inputEl   = document.getElementById("password");
+      const confirmEl = document.getElementById("passwordConfirm");
+      const passMsg   = document.getElementById("passMsg");
+      const input = (inputEl?.value || "").trim();
+
+      passMsg.textContent = "";
+
+      // 4자리 숫자 검사
+      if (!/^\d{4}$/.test(input)) {
+        passMsg.textContent = "비밀번호는 숫자 4자리여야 합니다.";
+        return;
+      }
+
+      const roomRef = firestoreDoc(db, "rooms", roomId);
+
+      if (isNewRoom) {
+        // 🔑 새 방 → 비밀번호 설정 모드
+        const confirmVal = (confirmEl?.value || "").trim();
+        if (input !== confirmVal) {
+          passMsg.textContent = "비밀번호와 확인이 일치하지 않습니다.";
+          return;
+        }
+
+        try {
+          await firestoreSet(roomRef, { password: input }, { merge: true });
+          roomPasswordCache = input;
+          isNewRoom = false;
+          showMain();
+        } catch (e) {
+          console.error(e);
+          passMsg.textContent = "비밀번호 설정 중 오류가 발생했습니다.";
+        }
       } else {
-        document.getElementById("passMsg").textContent = "비밀번호가 일치하지 않습니다. (이미 등록된 계정)";
+        // 🔓 기존 방 → 비밀번호 검증
+        try {
+          let stored = roomPasswordCache;
+
+          if (!stored) {
+            const snap = await firestoreGet(roomRef);
+            if (snap.exists()) {
+              const data = snap.data();
+              stored = data.password || null;
+              roomPasswordCache = stored;
+            }
+          }
+
+          if (!stored) {
+            passMsg.textContent = "이 방에는 아직 비밀번호가 설정되지 않았습니다.";
+            return;
+          }
+
+          if (input === stored) {
+            showMain();
+          } else {
+            passMsg.textContent = "비밀번호가 일치하지 않습니다.";
+          }
+        } catch (e) {
+          console.error(e);
+          passMsg.textContent = "비밀번호 확인 중 오류가 발생했습니다.";
+        }
       }
     };
 
@@ -285,131 +388,129 @@ const trashKey = `trashEntries_${roomId}`;
       document.getElementById("entries").style.display = "block";
     };
 
+    // 📌 Firestore에 기록 저장
     const saveEntry = async () => {
-  const entry = {
-    title: document.getElementById("title").value,
-    author: document.getElementById("author").value,
-    date: document.getElementById("date").value,
-    pages: document.getElementById("pages").value,
-    summary: document.getElementById("summary").value,
-    quote: document.getElementById("quote").value,
-    rating: document.getElementById("rating").value,
-    image: uploadedImageBase64
-  };
+      const entry = {
+        title:   document.getElementById("title").value,
+        author:  document.getElementById("author").value,
+        date:    document.getElementById("date").value,
+        pages:   document.getElementById("pages").value,
+        summary: document.getElementById("summary").value,
+        quote:   document.getElementById("quote").value,
+        rating:  document.getElementById("rating").value,
+        image:   uploadedImageBase64
+      };
 
-  const roomRef = firestoreDoc(db, "rooms", roomId);
-  const docSnap = await firestoreGet(roomRef);
-  let entries = [];
+      const roomRef = firestoreDoc(db, "rooms", roomId);
+      const docSnap = await firestoreGet(roomRef);
+      let entries = [];
 
-  if (docSnap.exists()) {
-    const data = docSnap.data();
-    entries = data.entries || [];
-  }
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        entries = data.entries || [];
+      }
 
-  entries.push(entry);
+      entries.push(entry);
 
-  await firestoreSet(roomRef, { entries: entries }, { merge: true });
-  alert("기록이 저장되었습니다!");
-  displayEntries();
-};
+      await firestoreSet(roomRef, { entries: entries }, { merge: true });
+      alert("기록이 저장되었습니다!");
+      displayEntries();
+    };
 
-
+    // 📌 기록 보여주기
     const displayEntries = async () => {
-  const roomRef = firestoreDoc(db, "rooms", roomId);
-  const docSnap = await firestoreGet(roomRef);
-  if (!docSnap.exists()) return;
+      const roomRef = firestoreDoc(db, "rooms", roomId);
+      const docSnap = await firestoreGet(roomRef);
+      if (!docSnap.exists()) return;
 
-  const data = docSnap.data();
-  const entries = data.entries || [];
+      const data = docSnap.data();
+      const entries = data.entries || [];
 
-  const div = document.getElementById("entries");
-  div.innerHTML = "";
+      const div = document.getElementById("entries");
+      div.innerHTML = "";
 
-  entries.slice().reverse().forEach((entry, i, arr) => {
-    const trueIndex = arr.length - 1 - i;
-    div.innerHTML += `
-      <div class="entry box">
-        <h3>${entry.title} - ${entry.author}</h3>
-        <p><strong>날짜:</strong> ${entry.date}</p>
-        <p><strong>페이지:</strong> ${entry.pages}</p>
-        <p><strong>요약:</strong> ${entry.summary}</p>
-        <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
-        <p><strong>별점:</strong> ${entry.rating}</p>
-        ${entry.image ? `<img src="${entry.image}" style='max-width:100%;' onclick='openModal("${entry.image}")'/>` : ""}
-        <button onclick="confirmDelete(${trueIndex})">삭제</button>
-      </div>`;
-  });
-};
+      entries.slice().reverse().forEach((entry, i, arr) => {
+        const trueIndex = arr.length - 1 - i;
+        div.innerHTML += `
+          <div class="entry box">
+            <h3>${entry.title} - ${entry.author}</h3>
+            <p><strong>날짜:</strong> ${entry.date}</p>
+            <p><strong>페이지:</strong> ${entry.pages}</p>
+            <p><strong>요약:</strong> ${entry.summary}</p>
+            <p><strong>인상 깊은 문장:</strong> "${entry.quote}"</p>
+            <p><strong>별점:</strong> ${entry.rating}</p>
+            ${entry.image ? `<img src="${entry.image}" style='max-width:100%;' onclick='openModal("${entry.image}")'/>` : ""}
+            <button onclick="confirmDelete(${trueIndex})">삭제</button>
+          </div>`;
+      });
+    };
 
-
-
-
+    // 📌 휴지통 목록
     const displayTrash = async () => {
-  const roomRef = firestoreDoc(db, "rooms", roomId);
-  const docSnap = await firestoreGet(roomRef);
-  if (!docSnap.exists()) return;
+      const roomRef = firestoreDoc(db, "rooms", roomId);
+      const docSnap = await firestoreGet(roomRef);
+      if (!docSnap.exists()) return;
 
-  const data = docSnap.data();
-  const trash = data.trash || [];
+      const data = docSnap.data();
+      const trash = data.trash || [];
 
-  const div = document.getElementById("trashEntries");
-  div.innerHTML = "";
-  trash.slice().reverse().forEach((entry, i, arr) => {
-    const trueIndex = arr.length - 1 - i;
-    div.innerHTML += `
-      <div class="trash-entry box">
-        <h4>${entry.title} - ${entry.author}</h4>
-        <button onclick="restoreEntry(${trueIndex})">복구</button>
-      </div>`;
-  });
-};
+      const div = document.getElementById("trashEntries");
+      div.innerHTML = "";
+      trash.slice().reverse().forEach((entry, i, arr) => {
+        const trueIndex = arr.length - 1 - i;
+        div.innerHTML += `
+          <div class="trash-entry box">
+            <h4>${entry.title} - ${entry.author}</h4>
+            <button onclick="restoreEntry(${trueIndex})">복구</button>
+          </div>`;
+      });
+    };
 
-
+    // 📌 삭제 → 휴지통 이동
     const confirmDelete = async (index) => {
-  if (!confirm("휴지통으로 보낼까요?")) return;
+      if (!confirm("휴지통으로 보낼까요?")) return;
 
-  const roomRef = firestoreDoc(db, "rooms", roomId);
-  const docSnap = await firestoreGet(roomRef);
-  if (docSnap.exists()) {
-    let data = docSnap.data();
-    let entries = data.entries || [];
-    let trash = data.trash || [];
+      const roomRef = firestoreDoc(db, "rooms", roomId);
+      const docSnap = await firestoreGet(roomRef);
+      if (docSnap.exists()) {
+        let data = docSnap.data();
+        let entries = data.entries || [];
+        let trash = data.trash || [];
 
-    const deleted = entries.splice(index, 1)[0]; // 삭제할 항목
-    trash.push(deleted);
+        const deleted = entries.splice(index, 1)[0];
+        trash.push(deleted);
 
-    await firestoreUpdate(roomRef, {
-      entries: entries,
-      trash: trash
-    });
+        await firestoreUpdate(roomRef, {
+          entries: entries,
+          trash: trash
+        });
 
-    displayEntries();
-    displayTrash();
-  }
-};
+        displayEntries();
+        displayTrash();
+      }
+    };
 
-
+    // 📌 휴지통 → 복구
     const restoreEntry = async (index) => {
-  const roomRef = firestoreDoc(db, "rooms", roomId);
-  const docSnap = await firestoreGet(roomRef);
-  if (!docSnap.exists()) return;
+      const roomRef = firestoreDoc(db, "rooms", roomId);
+      const docSnap = await firestoreGet(roomRef);
+      if (!docSnap.exists()) return;
 
-  let data = docSnap.data();
-  let entries = data.entries || [];
-  let trash = data.trash || [];
+      let data = docSnap.data();
+      let entries = data.entries || [];
+      let trash = data.trash || [];
 
-  const restored = trash.splice(index, 1)[0]; // 복구할 항목 꺼내기
-  entries.push(restored);
+      const restored = trash.splice(index, 1)[0];
+      entries.push(restored);
 
-  await firestoreUpdate(roomRef, {
-    entries: entries,
-    trash: trash
-  });
+      await firestoreUpdate(roomRef, {
+        entries: entries,
+        trash: trash
+      });
 
-  displayEntries();
-  displayTrash();
-};
-
+      displayEntries();
+      displayTrash();
+    };
 
     const toggleTrash = () => {
       const bin = document.getElementById("trashBin");
@@ -425,15 +526,39 @@ const trashKey = `trashEntries_${roomId}`;
       section.style.display = section.style.display === "block" ? "none" : "block";
     };
 
-    const changePassword = () => {
-      const oldPass = document.getElementById("oldPassword").value;
-      const newPass = document.getElementById("newPassword").value;
-      const storedPass = localStorage.getItem(passKey);
-      if (oldPass === storedPass && newPass.length === 4) {
-        localStorage.setItem(passKey, newPass);
-        document.getElementById("changeMessage").textContent = "비밀번호가 변경되었습니다.";
-      } else {
-        document.getElementById("changeMessage").textContent = "입력한 정보가 올바르지 않습니다.";
+    // 🔐 비밀번호 변경 (Firestore 사용)
+    const changePassword = async () => {
+      const oldPass = document.getElementById("oldPassword").value.trim();
+      const newPass = document.getElementById("newPassword").value.trim();
+      const msg = document.getElementById("changeMessage");
+      msg.textContent = "";
+
+      if (!/^\d{4}$/.test(newPass)) {
+        msg.textContent = "새 비밀번호는 숫자 4자리여야 합니다.";
+        return;
+      }
+
+      try {
+        const roomRef = firestoreDoc(db, "rooms", roomId);
+        const snap = await firestoreGet(roomRef);
+
+        if (!snap.exists() || !snap.data().password) {
+          msg.textContent = "설정된 비밀번호가 없습니다.";
+          return;
+        }
+
+        const current = snap.data().password;
+        if (oldPass !== current) {
+          msg.textContent = "기존 비밀번호가 올바르지 않습니다.";
+          return;
+        }
+
+        await firestoreUpdate(roomRef, { password: newPass });
+        roomPasswordCache = newPass;
+        msg.textContent = "비밀번호가 변경되었습니다.";
+      } catch (e) {
+        console.error(e);
+        msg.textContent = "비밀번호 변경 중 오류가 발생했습니다.";
       }
     };
 
@@ -474,19 +599,23 @@ const trashKey = `trashEntries_${roomId}`;
     };
 
     const clearTrash = async () => {
-  if (!confirm("휴지통을 완전히 비울까요?")) return;
+      if (!confirm("휴지통을 완전히 비울까요?")) return;
 
-  const roomRef = firestoreDoc(db, "rooms", roomId);
-  await firestoreUpdate(roomRef, {
-    trash: []
-  });
+      const roomRef = firestoreDoc(db, "rooms", roomId);
+      await firestoreUpdate(roomRef, {
+        trash: []
+      });
 
-  displayTrash();
-};
+      displayTrash();
+    };
 
+    // 🔥 페이지 로드 시 방의 비밀번호 상태 체크
+    window.addEventListener("load", initPasswordUI);
   </script>
 </body>
-</html> 
+</html>
+
+
 
 
 
